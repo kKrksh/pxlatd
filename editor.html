@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>editor</title>
+        <link rel="stylesheet" href="editor.css">
+        <script src="https://kit.fontawesome.com/d19a78c25e.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id="main">
+            <header>
+                <div class="center">
+                    <input type="color" id="colorInput">
+                </div>
+                <div class="center borderLeft">
+                    <span title="Eraser"><i class="fa-solid fa-eraser"></i></span>  
+                </div>
+                <div class="center borderLeft">
+                    <span title="Erase all"><i class="fa-solid fa-trash"></i></span>
+                </div>
+            </header>
+            <main>
+                <div id="container"></div>
+            </main>
+            <footer></footer>
+        </div>
+        <div id="popUp">
+            <div class="popUpContent">
+                <p class="center" id="popUpText">Input sprite size</p>
+                <div class="twoBlockGrid">
+                    <p class="center">x:</p>
+                    <p class="center">y:</p>
+                </div>
+                <div class="twoBlockGrid">
+                    <div class="center">
+                        <input type="number" class="sizeInput" placeholder="width" id="widthInput" >
+                    </div>
+                    <div class="center"> 
+                        <input type="number" class="sizeInput" placeholder="height" id="heightInput">
+                    </div>
+                </div>
+                <div class="center">
+                    <button class="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+        <script src="src/editor.js"></script>
+    </body>
+</html>
