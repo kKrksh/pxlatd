@@ -23,8 +23,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 });*/
 
 const Pxlatd = require("./src/host/index.js");
-startingx = 500;
-startingy = 500;
+let startingx = 500;
+let startingy = 500;
 
 window.addEventListener('DOMContentLoaded', async () => {
     const pxl = new Pxlatd("Test");
@@ -39,32 +39,64 @@ window.addEventListener('DOMContentLoaded', async () => {
             globalVelocity: 0
         }
     });
+
+    const movementFunc = (pxl, deltaX, deltaY) => async () => {
+      startingx += deltaX;
+      startingy += deltaY;
+
+      await pxl.queueAdd("player", true, false, {
+          x: startingx,
+          y: startingy,
+          scale: 1,
+          rotation: 0
+      });
+    };
+
+    pxl.onMouseClick(0, async (x, y, hit) => {
+        console.log("Click:", x, y);
+        await pxl.queueAdd("player", true, false, {
+            x: x,
+            y: y,
+            scale: 1,
+            rotation: 0
+        });
+
+        if (hit) {
+            console.log("Clicked sprite:", hit.id);
+            console.log("Sprite-local coords:", hit.localX, hit.localY);
+        }
+
+        startingx = x;
+        startingy = y;
+    });
+
     await pxl.renderSprite({
         id: "player",
         src: "src\\sprites\\test.jpg",
         x: 500,
         y: 500,
-        scale: 2,
+        scale: 1,
         layer: 0
     })
-    pxl.initEventLoop(60);
-    addEventListener("keydown", async (e) => {
-        if (e.key === "ArrowRight") {
-            startingx += 10;
-        } else if (e.key === "ArrowLeft") {
-            startingx -= 10;
-        } else if (e.key === "ArrowUp") {
-            startingy -= 10;
-        } else if (e.key === "ArrowDown") {
-            startingy += 10;
+    await pxl.renderSprite({
+        id: "player2",
+        src: "src\\sprites\\test.jpg",
+        x: 800,
+        y: 500,
+        scale: 1,
+        layer: 0
+    })
+    addEventListener("keydown", async (event) => {
+        if (event.key === "Tab"){
+          console.log(pxl.checkCollision("player", "player2"));
         }
-        await pxl.queueAdd("player", true, false, {
-            x: startingx,
-            y: startingy,
-            scale: 2,
-            rotation: 0
-        });
-    });
+    })
+
+    pxl.initEventLoop(60);
+    pxl.onKeyPress("ArrowRight", movementFunc(pxl, 10, 0));
+    pxl.onKeyPress("ArrowLeft", movementFunc(pxl, -10, 0));
+    pxl.onKeyPress("ArrowUp", movementFunc(pxl, 0, -10));
+    pxl.onKeyPress("ArrowDown", movementFunc(pxl, 0, 10));
 
 });
 

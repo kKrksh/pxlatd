@@ -17,7 +17,7 @@ module.exports = class Renderer {
         this.spritePos = {};
         this.idSourceMap = new Map();
     }
-
+    //create canvas
     init() {
         const container = document.getElementById("canvas");
         if (!container) throw new Error("Element #canvas not found");
@@ -34,7 +34,7 @@ module.exports = class Renderer {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
     }
-
+    //reads and caches sprite
     async loadSprite(src) {
         if (this.spriteCache.has(src)) return this.spriteCache.get(src);
 
@@ -71,13 +71,13 @@ module.exports = class Renderer {
         this.spriteCache.set(src, sprite);
         return sprite;
     }
-
+    //convert sprite cache to buffer
     async renderSprite({id, src, x = 0, y = 0, scale = 1, layer = 0, rotation = 0 }) {
-        this.spritePos[id] = {x, y, scale, rotation};
         this.idSourceMap.set(id, src);
         const sprite = await this.loadSprite(src);
         if (!sprite) return;
-
+        this.spritePos[id] = {x, y, scale, rotation, hitbox: { width: sprite.width * scale, height: sprite.height * scale }};
+        
         if (this.autoResize) {
             this.canvas.width = sprite.width * scale;
             this.canvas.height = sprite.height * scale;
@@ -147,7 +147,7 @@ module.exports = class Renderer {
         const loopMinY = Math.max(0, (y + bounds.minY) | 0);
         const loopMaxY = Math.min(H, (y + bounds.maxY) | 0);
 
-        //Inverse Mapping
+        //inverse Mapping
         for (let py = loopMinY; py < loopMaxY; py++) {
             for (let px = loopMinX; px < loopMaxX; px++) {
 
@@ -180,8 +180,7 @@ module.exports = class Renderer {
         }
     }
 
-
-
+    //display renders
     async flush() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let i = 0; i < this.layerBuffer.length; i++) {
@@ -190,15 +189,15 @@ module.exports = class Renderer {
             this.ctx.putImageData(buf, 0, 0);
         }
     }
-
+    //return sprite info
     async getSpritePositions(){
         return this.spritePos;
     }
-
+    //check for existing sprite id
     async checkForExistingSprite(id){
         return this.spritePos.hasOwnProperty(id);
     }
-
+    //rerender sprite at new pos
     async updateSpritePosition(id, {x, y, scale, rotation}){
         if (!this.spritePos[id]) throw new Error(`Sprite with ID ${id} does not exist.`);
         await this.renderSprite({
@@ -211,7 +210,7 @@ module.exports = class Renderer {
             layer: this.spritePos[id].layer
         })
     }
-
+    //reset display
     async clearLayers() {
         this.layerBuffer = [];
     }
