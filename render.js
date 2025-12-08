@@ -61,6 +61,8 @@ window.addEventListener('DOMContentLoaded', async () => {
             rotation: 0
         });
 
+        pxl.playSound("src\\sound\\ding.mp3");
+
         if (hit) {
             console.log("Clicked sprite:", hit.id);
             console.log("Sprite-local coords:", hit.localX, hit.localY);

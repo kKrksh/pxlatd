@@ -9,6 +9,7 @@ module.exports = class Pxlatd {
         this.renderer = null;
         this.physics = null;
         this.queue = [];
+        this.playingSound = {};
     }
     //init enginge
     init({
@@ -148,9 +149,17 @@ module.exports = class Pxlatd {
         );
     }
 
-    playSound(src){
+    playSound(id, src){
         const audio = new Audio(src);
         audio.play();
+        this.playingSound[id] = audio;
+    }
+
+    stopSound(id){
+        if (this.playingSound[id]){
+            this.playingSound[id].pause();
+            delete this.playingSound[id];
+        }
     }
 
     //helper func to list all event keys
