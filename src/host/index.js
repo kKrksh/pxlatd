@@ -136,6 +136,7 @@ module.exports = class Pxlatd {
         });
     }
 
+    //aabb collision detection
     checkCollision(a, b) {
         a = this.renderer.spritePos[a];
         b = this.renderer.spritePos[b];
@@ -145,6 +146,11 @@ module.exports = class Pxlatd {
             a.y + a.hitbox.height < b.y ||
             a.y > b.y + b.hitbox.height
         );
+    }
+
+    playSound(src){
+        const audio = new Audio(src);
+        audio.play();
     }
 
     //helper func to list all event keys
