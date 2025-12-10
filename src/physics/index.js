@@ -3,24 +3,16 @@ module.exports = class Physics {
         this.gravity = globalGravity;
         this.velocity = globalVelocity;
         this.hitBoxes = {};
-        this.globalEntities = {};
+        this.properties = {};
     }
 
-    setHitbox(id, {
-        width, height, offsetX = 0, offsetY = 0
-    }){
-        this.hitBoxes[id] = {}
+    setProperties(id, { mass = 1, gravity, velocityX = 0}){
+        this.properties[id] = {
+            mass: mass,
+            gravity: gravity !== undefined ? gravity : this.gravity,
+            velocityX: velocityX !== undefined ? velocityX : this.velocity
+        };
     }
 
-    applyProperties(id, {gravity = this.gravity, velocity = this.velocity, mass = 1}) {
-
-    }
-
-    sendGlobalEntities(){
-        return this.globalEntities;
-    }
-
-    receiveGlobalEntities(entities){
-        this.globalEntities = entities;
-    }
+    
 }

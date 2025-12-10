@@ -10,7 +10,10 @@ module.exports = class Pxlatd {
         this.physics = null;
         this.queue = [];
         this.playingSound = {};
+        this.camerLocked = false;
+        this.lockedSpriteId = null;
     }
+
     //init enginge
     init({
         window = {
@@ -26,35 +29,64 @@ module.exports = class Pxlatd {
         this.renderer.init();
         this.physics = new Physics(physics);
     }
-    //start even loop
-    initEventLoop(fps = 60) {
-        const tickRate = 1000 / fps;
-        //async event loop
-        const loop = async () => {
-            while (true) {
-                const start = performance.now();
-                if (this.queue.length > 0) this.clear();
-                await this.processQueue()
-                await this.rerenderUnchangedSprites();
-                await this.flush();
-                console.log(`Event loop tick at ${this.name}`);
 
-                const elapsed = performance.now() - start;
-                const delay = Math.max(0, tickRate - elapsed);
-                if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+    //start even loop
+    initEventLoop(targetFPS = 60) {
+        const renderFrameTime = 1000 / targetFPS;
+        const physicsStep = 1000 / 60; // physics locked at 60Hz
+
+        let last = performance.now();
+        let accumulator = 0;
+
+        const loop = async () => {
+            const now = performance.now();
+            const elapsed = now - last;
+            last = now;
+
+            accumulator += elapsed;
+
+            // fixed physics, temp disabled
+            /*while (accumulator >= physicsStep) {
+                this.physics.update(physicsStep / 1000);
+                accumulator -= physicsStep;
+                }*/
+            if (this.camerLocked) {
+                const spritePos = this.renderer.spritePos[this.lockedSpriteId];
+                if (spritePos) {
+
+                    const camX = spritePos.x - (this.renderer.width / 2);
+                    const camY = spritePos.y - (this.renderer.height / 2);
+
+                    this.renderer.shiftCamera(camX, camY, false);
+                }
             }
+            if (this.queue.length > 0) await this.clear();
+            await this.processQueue();
+            await this.rerenderUnchangedSprites();
+            await this.flush();
+
+
+            console.log(this.renderer.getCameraOffset());
+
+            const frameElapsed = performance.now() - now;
+            const delay = Math.max(0, renderFrameTime - frameElapsed);
+
+            setTimeout(loop, delay);
         };
 
         loop();
     }
+
     //prerenders sprite "src"
     async renderSprite({id, src, x = 0, y = 0, scale = 1, layer = 0 }){
         await this.renderer.renderSprite({id : id, src : src, x : x, y : y, scale : scale, layer : layer });
     }
+
     //display renders
     async flush(){  
         await this.renderer.flush();
     }
+
     //queue changes to object
     async queueAdd(id, visual = false, physics = false, {
         x = 0,
@@ -85,14 +117,28 @@ module.exports = class Pxlatd {
         this.queue = [];
     }
     async rerenderUnchangedSprites(){
-        for (const [id, pos] of Object.entries(this.renderer.spritePos)) {
+        /*for (const [id, pos] of Object.entries(this.renderer.spritePos)) {
             await this.renderer.renderSprite({id: id, src: this.renderer.idSourceMap.get(id), x: pos.x, y: pos.y, scale: pos.scale, rotation: pos.rotation, layer: pos.layer});
+        }*/
+        const spritePositions = await this.renderer.getSpritePositions();
+        const alreadyQueued = new Set(this.queue.map(item => item.id));
+
+        for (const [id, pos] of Object.entries(spritePositions)) {
+            if (alreadyQueued.has(id)) continue;
+            this.queueAdd(id, true, false, {
+                x: pos.x,
+                y: pos.y,
+                scale: pos.scale,
+                rotation: pos.rotation
+            });
         }
     }
+
     //reset display
     async clear(){
         await this.renderer.clearLayers();
     }
+
     //keyboard input handler
     async onKeyPress(key, run){
         window.addEventListener("keydown", async (e) => {
@@ -101,11 +147,14 @@ module.exports = class Pxlatd {
             }
         });   
     }
-    //mouse input handler and hit 1 detection
+
+    //mouse input handler and hit detection
     async onMouseClick(button, run = async (x, y, hit) => {}) {
         if (!this.renderer || !this.renderer.canvas) {
             throw new Error("Renderer not initialized before setting mouse listener.");
         }
+
+        
 
         const canvas = this.renderer.canvas;
 
@@ -115,8 +164,8 @@ module.exports = class Pxlatd {
             const rect = canvas.getBoundingClientRect();
 
             //display to canvas coords
-            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            const x = (e.clientX + this.renderer.getCameraOffset().x - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY + this.renderer.getCameraOffset().y - rect.top) * (canvas.height / rect.height);
 
             //sprite hit?
             let hit = null;
@@ -135,6 +184,21 @@ module.exports = class Pxlatd {
             }
             await run(x, y, hit);
         });
+    }
+    
+    shiftCamera(x, y, rerender = true){
+        console.log("Shifting camera:", x, y);
+        this.renderer.shiftCamera(x, y);
+        if (rerender) this.rerenderUnchangedSprites();
+    }
+
+    lockCameraToSprite(id){
+        this.lockedSpriteId = id;
+        this.camerLocked = true;
+    }
+
+    unlockCamera(){
+        this.camerLocked = false;
     }
 
     //aabb collision detection

@@ -16,6 +16,7 @@ module.exports = class Renderer {
         this.layerBuffer = [];
         this.spritePos = {};
         this.idSourceMap = new Map();
+        this.globalOffset = { x: 0, y: 0 };
     }
     //create canvas
     init() {
@@ -77,6 +78,9 @@ module.exports = class Renderer {
         const sprite = await this.loadSprite(src);
         if (!sprite) return;
         this.spritePos[id] = {x, y, scale, rotation, hitbox: { width: sprite.width * scale, height: sprite.height * scale }};
+
+        x -= this.globalOffset.x;
+        y -= this.globalOffset.y;
         
         if (this.autoResize) {
             this.canvas.width = sprite.width * scale;
@@ -189,10 +193,7 @@ module.exports = class Renderer {
             this.ctx.putImageData(buf, 0, 0);
         }
     }
-    //return sprite info
-    async getSpritePositions(){
-        return this.spritePos;
-    }
+    
     //check for existing sprite id
     async checkForExistingSprite(id){
         return this.spritePos.hasOwnProperty(id);
@@ -210,8 +211,23 @@ module.exports = class Renderer {
             layer: this.spritePos[id].layer
         })
     }
+
+    async shiftCamera(x, y) {
+        this.globalOffset.x = x;
+        this.globalOffset.y = y;
+    }
+
     //reset display
     async clearLayers() {
         this.layerBuffer = [];
+    }
+
+    //return sprite info
+    async getSpritePositions(){
+        return this.spritePos;
+    }
+
+    getCameraOffset(){
+        return this.globalOffset;
     }
 }

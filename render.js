@@ -83,16 +83,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     await pxl.renderSprite({
         id: "player2",
         src: "src\\sprites\\test.jpg",
-        x: 800,
+        x: 2000,
         y: 500,
         scale: 1,
         layer: 0
     })
-    addEventListener("keydown", async (event) => {
-        if (event.key === "Tab"){
+    addEventListener("keypress", async (event) => {
+        /*if (event.key === "Tab"){
           console.log(pxl.checkCollision("player", "player2"));
-        }
+        }*/
+       console.log("Keypress:", event.key);
+       if (event.key === "w"){
+          pxl.shiftCamera(400,0);
+       }
     })
+
+    pxl.lockCameraToSprite("player");
 
     pxl.initEventLoop(60);
     pxl.onKeyPress("ArrowRight", movementFunc(pxl, 10, 0));
