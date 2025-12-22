@@ -1,0 +1,27 @@
+{
+  "name": "pxlatd",
+  "version": "1.0.0",
+  "dependencies": {
+    "path": "^0.12.7"
+  },
+  "main": "examples/flappybird/src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^38.3.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.pxlatd.editor",
+    "productName": "PXLATD Editor",
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "posData": {
+    "sprite0": {
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "rotation": 0,
+      "renderIndex": 1220,
+      "hitbox": {
+        "width": 571,
+        "height": 298
+      },
+      "layer": 0
+    },
+    "sprite1": {
+      "x": 200,
+      "y": 200,
+      "scale": 1,
+      "rotation": 0,
+      "renderIndex": 1221,
+      "hitbox": {
+        "width": 53,
+        "height": 71
+      },
+      "layer": 1
+    }
+  },
+  "idSourceMap": [
+    [
+      "sprite0",
+      "..\\sprites\\ikit_meme.png"
+    ],
+    [
+      "sprite1",
+      "..\\sprites\\testSprite.png"
+    ]
+  ]
+}

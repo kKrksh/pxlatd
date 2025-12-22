@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PXLATD Editor</title>
+    <script src="https://kit.fontawesome.com/d19a78c25e.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            overflow: hidden;
+        }
+
+        #main {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            grid-template-rows: 60px 1fr;
+            gap: 0;
+        }
+
+        #header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2a2a2a;
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .header-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #000000;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        .header-btn:active {
+            transform: translateY(0);
+        }
+
+        .file-selector {
+            min-width: 180px;
+            padding: 8px 14px;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .file-selector:hover {
+            border-color: #404040;
+            background: #252525;
+        }
+
+        .file-selector:focus {
+            border-color: #505050;
+        }
+
+        .file-selector option {
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .file-selector option:hover {
+            background: #252525;
+        }
+
+        .file-selector option:checked {
+            background: #2a2a2a;
+            color: #ffffff;
+        }
+
+        #canvas-container {
+            background: #0f0f0f;
+            border-right: 1px solid #2a2a2a;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        #sidebar {
+            background: #1a1a1a;
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 1px solid #2a2a2a;
+        }
+
+        .sidebar-section {
+            margin-bottom: 28px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #808080;
+            margin-bottom: 14px;
+            letter-spacing: 1.2px;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #b0b0b0;
+            margin-bottom: 6px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            background: #0f0f0f;
+            color: #ffffff;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #505050;
+            background: #151515;
+        }
+
+        .input-field:read-only {
+            background: #252525;
+            cursor: not-allowed;
+            color: #808080;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Prompt Overlay */
+        #prompt-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #prompt-box {
+            width: 400px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #prompt-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        #prompt-message {
+            font-size: 13px;
+            color: #b0b0b0;
+            margin-bottom: 18px;
+        }
+
+        #prompt-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            background: #0f0f0f;
+            font-size: 13px;
+            color: #ffffff;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        #prompt-input:focus {
+            border-color: #505050;
+            background: #151515;
+        }
+
+        .prompt-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .prompt-actions button {
+            padding: 8px 18px;
+            border-radius: 6px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #prompt-cancel {
+            background: #2a2a2a;
+            color: #b0b0b0;
+        }
+
+        #prompt-cancel:hover {
+            background: #353535;
+        }
+
+        #prompt-ok {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        #prompt-ok:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        /* Scrollbar styling */
+        #sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background: #404040;
+            border-radius: 3px;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb:hover {
+            background: #505050;
+        }
+
+        .icon {
+            font-size: 14px;
+            margin-right: 6px;
+            color: #808080;
+        }
+    </style>
+</head>
+<body>
+    <!-- Prompt Overlay -->
+    <div id="prompt-overlay">
+        <div id="prompt-box">
+            <h2 id="prompt-title">Input Required</h2>
+            <p id="prompt-message">Please enter the file name</p>
+            <input id="prompt-input" type="text" placeholder="Type here..." autocomplete="off" />
+            <div class="prompt-actions">
+                <button id="prompt-cancel">Cancel</button>
+                <button id="prompt-ok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="main">
+        <!-- Header -->
+        <header id="header">
+            <div class="header-left">
+                <div class="logo-container">
+                    <i class="fas fa-palette icon" style="font-size: 22px; color: #ffffff; margin: 0;"></i>
+                    <span class="logo-text">PXLATD</span>
+                </div>
+                <button id="openFile" class="header-btn">
+                    <i class="fas fa-folder-open" style="margin-right: 6px;"></i>Open File
+                </button>
+            </div>
+            <select name="Sprites" id="fileSelector" class="file-selector">
+                <option value="Select File">Select File</option>
+            </select>
+        </header>
+
+        <!-- Canvas Container -->
+        <div id="canvas"></div>
+
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <div class="sidebar-section">
+                <div class="section-title">Sprite Properties</div>
+                
+                <div class="input-group">
+                    <label class="input-label">
+                        <i class="fas fa-image icon"></i>Sprite ID
+                    </label>
+                    <input type="text" id="spriteId" class="input-field" readonly>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">Position</div>
+                
+                <div class="input-group">
+                    <label class="input-label">
+                        <i class="fas fa-arrows-alt-h icon"></i>X Coordinate
+                    </label>
+                    <input type="number" id="xCoords" class="input-field">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">
+                        <i class="fas fa-arrows-alt-v icon"></i>Y Coordinate
+                    </label>
+                    <input type="number" id="yCoords" class="input-field">
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">Transform</div>
+                
+                <div class="input-group">
+                    <label class="input-label">
+                        <i class="fas fa-search-plus icon"></i>Scale
+                    </label>
+                    <input type="number" id="scale" class="input-field" step="0.1">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">
+                        <i class="fas fa-sync-alt icon"></i>Rotation (deg)
+                    </label>
+                    <input type="number" id="rotation" class="input-field">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" style="display: none;">
+ 
+    <script src="editor.js">
+    </script>
+</body>
+</html>

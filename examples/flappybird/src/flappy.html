@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+        <style>
+            body, html{
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                margin: 0;
+                font-family: "Pixelify Sans", sans-serif;
+            }
+
+            #message{
+                font-size: 100px;
+                display: flex;
+                height: 100%;
+                width: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                color: white;
+                user-select: none;
+            }
+
+            #score{
+                height: 5%;
+                width: 5%;
+                font-size: 50px;
+                padding: 20px;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                z-index: 9998;
+                user-select: none;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="score">0</div>
+        <div id="message">Press Tab to start</div>
+        <div id="canvas"></div>
+        <script src="flappy.js"></script>
+    </body>
+</html>
