@@ -39,7 +39,7 @@ You can also use a CDN though it's not encouraged.
 
 ## Usage
 
-#####The HTML file has to have a div in the body with the id "canvas"
+NOTE: The HTML file has to have a div in the body with the id "canvas"
 
 Initializing the class
 ```javascript
