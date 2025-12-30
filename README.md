@@ -74,7 +74,7 @@ await engine.renderSprite({
 
 PXLATD provides many other functions, but I am too lazy to document them.
 
-For further guidance refer to the source code at https://github.com/kKrksh/pxlatd/blob/main/src/PXLATD-GPU/pxlatd.js.
+For further guidance refer to the source code at https://github.com/kKrksh/pxlatd/blob/main/src/PXLATD-GPU/PXLATDR.js.
 
 Each functions parameters have detailed labeling to where you should be able to understand what to pass into that function. Currently error handling isn't widely present in the code so be careful.
 
