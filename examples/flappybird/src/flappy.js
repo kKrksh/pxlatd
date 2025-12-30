@@ -1,4 +1,4 @@
-const {Pxlatd} = require("../../../src/PXLATD-GPU/pxlatd.js")
+const {Pxlatd} = require("../../../src/PXLATD-GPU/PXLATDR.js")
 
 window.addEventListener("DOMContentLoaded", async () => {
     const pxlatd = new Pxlatd("Flappy")
@@ -87,9 +87,15 @@ window.addEventListener("DOMContentLoaded", async () => {
     let tilt = 0
 
     pxlatd.onKeyPress("Tab", async () => {
-        if (running) gravity = -10
+        if (running) {
+            gravity = -10
+            pxlatd.playSound("jump","../assets/sfx_wing.wav", 0.5)
+        }
         else {
             pxlatd.addFrameFunction("gameLogic", async () => {
+                console.log(ticks)
+
+
                 gravity += 0.4
                 await pxlatd.queueAdd("player", true, false, {
                     x: 800,
@@ -107,7 +113,7 @@ window.addEventListener("DOMContentLoaded", async () => {
                     spawnInterval -= 10
                     tickTicks = 0
                 }
-                if (ticks === spawnInterval){
+                if (ticks >= spawnInterval){
                     await spawnPipes()
                     if (currentPipe !== 6) currentPipe++;
                     else currentPipe = 1
@@ -118,11 +124,8 @@ window.addEventListener("DOMContentLoaded", async () => {
                     if (pxlatd.getSpriteData().has(`currentPipe${i}-top`)){
                         let batch3 = await pxlatd.checkCollisionsBatch([["player",`collider${i}`]])
 
-                        console.log(next)
-
                         if (batch3.length && next === i) {
                             score++;
-                            console.log(score)
                             document.getElementById("score").innerHTML = score
                             if (next !== 6) next++
                             else next = 1
@@ -149,9 +152,13 @@ window.addEventListener("DOMContentLoaded", async () => {
                             rotation: 0
                         })
 
-                        let firstBatch = await pxlatd.checkCollisionsBatch([["player",`currentPipe${i}-top`]])
-                        let secondBatch = await pxlatd.checkCollisionsBatch([["player",`currentPipe${i}-bottom`]])
-                        if (firstBatch.length || secondBatch.length || pxlatd.getSpriteData().get("player").y > window.innerHeight || pxlatd.getSpriteData().get("player").y < 0 ){
+                        //console.log(await pxlatd.checkCollisions())
+
+                        //let firstBatch = await pxlatd.checkCollisionsBatch([["player",`currentPipe${i}-top`]])
+                        //let secondBatch = await pxlatd.checkCollisionsBatch([["player",`currentPipe${i}-bottom`]])
+                        if (/*pxlatd.checkCollisions().length !== 0 ||*/ pxlatd.getSpriteData().get("player").y > window.innerHeight || pxlatd.getSpriteData().get("player").y < 0 ){
+                                /*pxlatd.playSound("hit","../assets/sfx_hit.wav",0.5)
+                                pxlatd.playSound("death","../assets/sfx_die.wav",0.5)*/
                                 pxlatd.removeFrameFunction("gameLogic")
                                 document.getElementById("message").style.display = "flex"
                                 document.getElementById("message").innerHTML = "GAME OVER"
@@ -189,8 +196,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 
 
-    pxlatd.initEventLoop(60,60)
+    pxlatd.initEventLoop(1000,60)
+
+    pxlatd.renderText(500,500,"test",40,45, "sans-serif","#ffffff")
 })
-
-
-//Message for new Commit

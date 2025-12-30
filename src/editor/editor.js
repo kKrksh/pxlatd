@@ -1,4 +1,4 @@
-const {Pxlatd} = require("../PXLATD AI refined/pxlatd.js");
+const {Pxlatd} = require("../PXLATD-GPU/PXLATDR.js");
 const { ipcRenderer } = require("electron");
 const fs = require("fs");
 const path = require("path");
@@ -73,7 +73,10 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 
   function getSpriteData(id) {
-    const data = pxl.getSpriteData()[id];
+    //console.log(id)
+    const data = pxl.getSpriteData().get(id);
+    console.log(pxl.getSpriteData())
+    console.log(data)
     return {
       x: data.x,
       y: data.y,
@@ -198,6 +201,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (hit && hit.id !== currentlyHoveredSprite) {
       console.log("test")
       currentlyHoveredSprite = hit.id;
+      console.log("hit: ", hit)
       displayData(hit.id, getSpriteData(hit.id));
       return;
     }
@@ -205,17 +209,13 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (!currentlyHoveredSprite) return;
 
     pxl.queueAdd(currentlyHoveredSprite, true, false, {
-      x,
-      y,
-      scale: pxl.getSpriteData()[currentlyHoveredSprite].scale,
-      rotation: pxl.getSpriteData()[currentlyHoveredSprite].rotation
+      x: getSpriteData(currentlyHoveredSprite).x,
+      y: getSpriteData(currentlyHoveredSprite).y,
+      scale: getSpriteData(currentlyHoveredSprite).scale,
+      rotation: getSpriteData(currentlyHoveredSprite).rotation
     });
 
-    displayData(currentlyHoveredSprite, {
-      x,
-      y,
-      ...getSpriteData(currentlyHoveredSprite)
-    });
+    displayData(currentlyHoveredSprite, getSpriteData(currentlyHoveredSprite));
   });
 
   pxl.onKeyPress("Escape", () => {
@@ -286,5 +286,4 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   
   pxl.initEventLoop(60);
-  pxl.loadScene("src/sprites/data.json")
 });

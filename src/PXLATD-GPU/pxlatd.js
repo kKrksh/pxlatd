@@ -280,8 +280,9 @@ class Pxlatd {
         this.loopFunctions.delete(name)
     }
 
-    playSound(id, src) {
+    playSound(id, src, volume) {
         const audio = new Audio(src);
+        audio.volume = volume
         audio.play().catch(() => {});
         this.playingSound[id] = audio;
     }
