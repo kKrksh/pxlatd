@@ -43,7 +43,7 @@ NOTE: The HTML file has to have a div in the body with the id "canvas"
 
 Initializing the class
 ```javascript
-    const engine = new Pxlatd("MyGame");
+const engine = new Pxlatd("MyGame");
 ```
 Initializing window
 ```javascript
