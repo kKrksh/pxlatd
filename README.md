@@ -92,7 +92,7 @@ Here's the electron docs which walk you step by step on how to create an electro
 https://www.electronjs.org/docs/latest/
 ## Demo
 
-There's and example game provided at:
+There's an example game provided at:
 
 https://github.com/kKrksh/pxlatd/tree/main/examples
 
